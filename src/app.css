@@ -33,22 +33,6 @@
   font-family: 'Courier New', Courier, monospace;
 }
 
-button.reset {
-  background-color: khaki;
-}
-
-button.pause {
-  background-color: lightcoral;
-}
-
-button.step {
-  background-color: lightseagreen;
-}
-
-button.play {
-  background-color: lightgreen;
-}
-
 
 .lines {
   position: relative;
@@ -191,4 +175,52 @@ button.play {
 
 .walls-15 {
   border-width: 1px 1px 1px 1px;
+}
+
+button.reset {
+  background-color: hsl(54, 77%, 75%);
+}
+
+button.pause {
+  background-color: hsl(0, 79%, 72%);
+}
+
+button.step {
+  background-color: hsl(177, 70%, 41%);
+}
+
+button.play {
+  background-color: hsl(120, 73%, 75%);
+}
+
+button.reset:hover {
+  background-color: hsl(54, 77%, 80%);
+}
+
+button.pause:hover {
+  background-color: hsl(0, 79%, 75%);
+}
+
+button.step:hover {
+  background-color: hsl(177, 70%, 43%);
+}
+
+button.play:hover {
+  background-color: hsl(120, 73%, 80%);
+}
+
+button.reset:active {
+  background-color: hsl(54, 60%, 70%);
+}
+
+button.pause:active {
+  background-color: hsl(0, 60%, 67%);
+}
+
+button.step:active {
+  background-color: hsl(177, 70%, 37%);
+}
+
+button.play:active {
+  background-color: hsl(120, 50%, 70%);
 }

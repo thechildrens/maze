@@ -21,6 +21,9 @@ type State = {
   crab: Pos
   coco: Pos
   text: string
+  answer: number
+  went: Array<number>
+  back: Array<number>
   tiles: Array<Array<number>>
 }
 
@@ -44,6 +47,23 @@ function parseLine(line: string) {
 // Todo: memo last
 function parseText(text: string) {
   return text.split('\n').map(parseLine)
+}
+
+const WALLCHECKS: { [k: string]: number } = {
+  up: 0b0001,
+  right: 0b0010,
+  down: 0b0100,
+  left: 0b1000,
+}
+
+function pos2num(p: Pos): number {
+  return (p.y << 8) + p.x
+}
+
+const XPOW = 2 ^ 8 - 1
+
+function num2pos(n: number): Pos {
+  return { x: n & XPOW, y: n >> 8 }
 }
 
 function reducer(state: State, action: any): State {
@@ -70,50 +90,69 @@ function reducer(state: State, action: any): State {
       }
 
       let change = {}
+      let where
+      let pnum: number
       const walls = state.tiles[state.crab.y][state.crab.x]
 
-      console.log(line)
-      switch (line[0]) {
-        case 'move':
-          switch (line[1]) {
-            case 'up':
-              if (walls & 0b0001) break
-              change = {
-                crab: { x: state.crab.x, y: state.crab.y - 1 }
-              }
-              break
-            case 'down':
-              if (walls & 0b0100) break
-              change = {
-                crab: { x: state.crab.x, y: state.crab.y + 1 }
-              }
-              break
-            case 'left':
-              if (walls & 0b1000) break
-              change = {
-                crab: { x: state.crab.x - 1, y: state.crab.y }
-              }
-              break
-            case 'right':
-              if (walls & 0b0010) break
-              change = {
-                crab: { x: state.crab.x + 1, y: state.crab.y }
-              }
-              break
-          }
-          break
-        case 'visit':
-          if (walls & 0b0010) break
-          change = {
-            crab: { x: state.crab.x + 1, y: state.crab.y }
-          }
-          break
+      const vars: { [k: string]: Pos } = {
+        here: state.crab,
+        up: { x: state.crab.x, y: state.crab.y - 1 },
+        down: { x: state.crab.x, y: state.crab.y + 1 },
+        left: { x: state.crab.x - 1, y: state.crab.y },
+        right: { x: state.crab.x + 1, y: state.crab.y },
+      }
 
+      switch (line[0]) {
+        case 'go':
+          switch (line[1]) {
+            case 'back':
+              let last = state.back.pop()
+              if (last == null) {
+                change = {
+                  answer: 1
+                }
+              } else {
+                change = {
+                  back: [...state.back]
+                }
+              }
+              break
+            default:
+              const dir = line[1]
+              if (walls & WALLCHECKS[dir]) {
+                change = {
+                  answer: 1
+                }
+              } else {
+                change = {
+                  crab: vars[dir]
+                }
+              }
+          }
+          break
+        case 'went':
+          where = vars[line[1]]
+          pnum = pos2num(where)
+
+          change = {
+            went: [...state.went, pnum],
+            back: [...state.back, pnum]
+          }
+          break
+        case 'went?':
+          where = vars[line[1]]
+          pnum = pos2num(where)
+
+          change = {
+            answer: state.went.findIndex(n => n === pnum) === -1 ? 1 : 0
+          }
+          break
       }
 
       return {
         ...state,
         line: (state.line + 1) % text.length,
+        answer: 0,
         ...change,
       }
   }
@@ -125,6 +164,9 @@ const INIT: State = {
   line: -1,
   crab: { x: 0, y: 0 },
   coco: { x: 3, y: 0 },
+  answer: 0,
+  went: [],
+  back: [],
   tiles: WALLS,
   text: ''
 }
@@ -168,17 +210,17 @@ function App() {
     <>
       <div className="app">
         <div className="grid-container">
-          <div className="avatar crab" style={{
-            background: `url(${Sprites}) no-repeat`,
-            width: 32,
-            height: 32,
-            transform: `translate(${state.crab.x * GRID_PX + 4}px, ${state.crab.y * GRID_PX + 4}px)`
-          }} />
           <div className="avatar coco" style={{
             background: `url(${Sprites}) no-repeat -32px 0`,
             width: 32,
             height: 32,
             transform: `translate(${state.coco.x * GRID_PX + 4}px, ${state.coco.y * GRID_PX + 4}px)`
+          }} />
+          <div className="avatar crab" style={{
+            background: `url(${Sprites}) no-repeat`,
+            width: 32,
+            height: 32,
+            transform: `translate(${state.crab.x * GRID_PX + 4}px, ${state.crab.y * GRID_PX + 4}px)`
           }} />
           <Grid walls={state.tiles} />
         </div>
