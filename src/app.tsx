@@ -21,7 +21,7 @@ type State = {
   crab: Pos
   coco: Pos
   text: string
-  answer: number
+  result: number
   went: Array<number>
   back: Array<number>
   tiles: Array<Array<number>>
@@ -109,7 +109,7 @@ function reducer(state: State, action: any): State {
               let last = state.back.pop()
               if (last == null) {
                 change = {
-                  answer: 1
+                  result: 1
                 }
               } else {
                 change = {
@@ -121,7 +121,7 @@ function reducer(state: State, action: any): State {
               const dir = line[1]
               if (walls & WALLCHECKS[dir]) {
                 change = {
-                  answer: 1
+                  result: 1
                 }
               } else {
                 change = {
@@ -144,7 +144,7 @@ function reducer(state: State, action: any): State {
           pnum = pos2num(where)
 
           change = {
-            answer: state.went.findIndex(n => n === pnum) === -1 ? 1 : 0
+            result: state.went.findIndex(n => n === pnum) === -1 ? 1 : 0
           }
           break
       }
@@ -152,7 +152,7 @@ function reducer(state: State, action: any): State {
       return {
         ...state,
         line: (state.line + 1) % text.length,
-        answer: 0,
+        result: 0,
         ...change,
       }
   }
@@ -164,7 +164,7 @@ const INIT: State = {
   line: -1,
   crab: { x: 0, y: 0 },
   coco: { x: 3, y: 0 },
-  answer: 0,
+  result: 0,
   went: [],
   back: [],
   tiles: WALLS,
