@@ -83,10 +83,28 @@ function reducer(state: State, action: any): State {
       }
     case 'step':
       const text = parseText(state.text.trim())
+      const nextline = (state.line + 1) % text.length
       const line = text[state.line]
       if (line == null) return {
         ...state,
-        line: state.line + 1
+        line: nextline,
+        result: -1
+      }
+
+      const rail = line[line.length - 1]
+      if (rail === '+' && state.result < 0) {
+        return {
+          ...state,
+          line: nextline,
+          result: 0
+        }
+      }
+      if (rail === '-' && state.result > -1) {
+        return {
+          ...state,
+          line: nextline,
+          result: 0
+        }
       }
 
       let change = {}
@@ -109,7 +127,7 @@ function reducer(state: State, action: any): State {
               let last = state.back.pop()
               if (last == null) {
                 change = {
-                  result: 1
+                  result: -1
                 }
               } else {
                 change = {
@@ -121,7 +139,7 @@ function reducer(state: State, action: any): State {
               const dir = line[1]
               if (walls & WALLCHECKS[dir]) {
                 change = {
-                  result: 1
+                  result: -1
                 }
               } else {
                 change = {
@@ -144,14 +162,14 @@ function reducer(state: State, action: any): State {
           pnum = pos2num(where)
 
           change = {
-            result: state.went.findIndex(n => n === pnum) === -1 ? 1 : 0
+            result: state.went.findIndex(n => n === pnum)
           }
           break
       }
 
       return {
         ...state,
-        line: (state.line + 1) % text.length,
+        line: nextline,
         result: 0,
         ...change,
       }
