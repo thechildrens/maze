@@ -25,9 +25,25 @@ type State = {
 }
 
 
+function parseLine(line: string) {
+  let branch = ''
+  if (line.startsWith('+')) {
+    branch = '+'
+    line = line.slice(1)
+  }
+  else if (line.startsWith('-')) {
+    branch = '-'
+    line = line.slice(1)
+  }
+
+  const parsed = line.split(' ')
+  parsed.push(branch)
+  return parsed
+}
+
 // Todo: memo last
 function parseText(text: string) {
-  return text.split('\n')
+  return text.split('\n').map(parseLine)
 }
 
 function reducer(state: State, action: any): State {
@@ -36,39 +52,63 @@ function reducer(state: State, action: any): State {
       return {
         ...state,
         line: -1,
+        crab: INIT.crab,
         text: action.text,
       }
     case 'reset':
       return {
         ...state,
         line: -1,
+        crab: INIT.crab,
       }
     case 'step':
       const text = parseText(state.text.trim())
       const line = text[state.line]
+      if (line == null) return {
+        ...state,
+        line: state.line + 1
+      }
 
       let change = {}
-      switch (line) {
-        case 'move up':
-          change = {
-            crab: { x: state.crab.x, y: state.crab.y - 1 }
+      const walls = state.tiles[state.crab.y][state.crab.x]
+
+      console.log(line)
+      switch (line[0]) {
+        case 'move':
+          switch (line[1]) {
+            case 'up':
+              if (walls & 0b0001) break
+              change = {
+                crab: { x: state.crab.x, y: state.crab.y - 1 }
+              }
+              break
+            case 'down':
+              if (walls & 0b0100) break
+              change = {
+                crab: { x: state.crab.x, y: state.crab.y + 1 }
+              }
+              break
+            case 'left':
+              if (walls & 0b1000) break
+              change = {
+                crab: { x: state.crab.x - 1, y: state.crab.y }
+              }
+              break
+            case 'right':
+              if (walls & 0b0010) break
+              change = {
+                crab: { x: state.crab.x + 1, y: state.crab.y }
+              }
+              break
           }
           break
-        case 'move down':
-          change = {
-            crab: { x: state.crab.x, y: state.crab.y + 1 }
-          }
-          break
-        case 'move left':
-          change = {
-            crab: { x: state.crab.x - 1, y: state.crab.y }
-          }
-          break
-        case 'move right':
+        case 'visit':
+          if (walls & 0b0010) break
           change = {
             crab: { x: state.crab.x + 1, y: state.crab.y }
           }
           break
+
       }
 
       return {
@@ -95,15 +135,17 @@ function App() {
   const [state, dispatch] = useReducer(reducer, INIT)
   const [intv, setIntv] = useState(0 as any)
 
-  const reset = useCallback(() => {
-    dispatch({ type: 'reset' })
-  }, [])
-
   const handleInput = useCallback((val: any) => {
     dispatch({ type: 'edit', text: val })
   }, [dispatch])
 
+  const reset = useCallback(() => {
+    if (intv !== 0) return
+    dispatch({ type: 'reset' })
+  }, [])
+
   const stepNext = useCallback(() => {
+    if (intv !== 0) return
     dispatch({ type: 'step' })
   }, [dispatch])
 
@@ -161,8 +203,8 @@ function App() {
               return lis.join('\n')
             }}
           />
-        </div>`
-      </div>`
+        </div>
+      </div>
     </>
   )
 }
