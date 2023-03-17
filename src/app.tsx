@@ -70,7 +70,6 @@ function num2pos(n: number): Pos {
 function reducer(state: State, action: any): State {
   switch (action.type) {
     case '@REWIND':
-      console.log(action)
       return action.lastState
     case 'edit':
       return {
@@ -156,7 +155,6 @@ function reducer(state: State, action: any): State {
                 const went = [...state.went]
                 pnum = pos2num(vars.here)
                 if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
-                console.log(vars.here)
                 change = {
                   crab: vars[dir],
                   went,
