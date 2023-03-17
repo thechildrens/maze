@@ -4,6 +4,7 @@ import Sprites from './sprites.png'
 import './app.css'
 import { Grid } from './grid';
 import { useCustomReducer } from './reducer';
+import { Win } from './win';
 
 const WALLS = [
   [9, 5, 1, 3],
@@ -25,6 +26,7 @@ type State = {
   result: number
   went: Array<number>
   back: Array<number>
+  win: boolean
   tiles: Array<Array<number>>
 }
 
@@ -158,6 +160,7 @@ function reducer(state: State, action: any): State {
                 change = {
                   crab: vars[dir],
                   went,
+                  win: pos2num(vars[dir]) === pos2num(state.coco),
                   back: [...state.back, pnum]
                 }
               }
@@ -201,6 +204,7 @@ const INIT: State = {
   result: 0,
   went: [],
   back: [],
+  win: false,
   tiles: WALLS,
   text: ''
 }
@@ -243,13 +247,19 @@ function App() {
   const startPlay = useCallback(() => {
     if (intv !== 0) return
     const interval = setInterval(() => {
-      dispatch({ type: 'step' })
+      if (state.win) {
+        clearInterval(intv)
+        setIntv(0)
+      } else {
+        dispatch({ type: 'step' })
+      }
     }, 1000)
     setIntv(interval)
-  }, [intv, setIntv, dispatch])
+  }, [state.win, intv, setIntv, dispatch])
 
   return (
     <>
+      {state.win && <Win goNext={() => null} />}
       <div className="app">
         <div className="grid-container">
           <div className="avatar coco" style={{
@@ -295,6 +305,7 @@ function App() {
             <div>crab: {displayPos(state.crab)}</div>
             <div>coco: {displayPos(state.coco)}</div>
           </div>
+          <div>win: {state.win ? 'true' : 'false'}</div>
           <div>went: ...{state.went.slice(-5).map(num2pos).map(displayPos).join(' ')}</div>
           <div>back: ...{state.back.slice(-5).map(num2pos).map(displayPos).join('\n')}</div>
         </div>
