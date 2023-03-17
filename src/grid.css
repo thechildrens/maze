@@ -1,0 +1,38 @@
+.grid {
+  display: flex;
+  flex-direction: column;
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 11px;
+}
+
+.grid-row {
+  display: flex;
+}
+
+.grid-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  box-sizing: border-box;
+  background-color: wheat;
+  background-image: url(./sprites.png);
+  background-position: -93px 2px;
+}
+
+.tiles-0 {
+  background-image: none;
+}
+
+.tiles-2 {
+  background-position: 3px -30px;
+}
+
+.grid-row:nth-child(odd) .grid-cell:nth-child(even) {
+  background-color: rgb(233, 205, 164);
+}
+
+.grid-row:nth-child(even) .grid-cell:nth-child(odd) {
+  background-color: rgb(233, 205, 164);
+}

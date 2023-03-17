@@ -1,15 +1,16 @@
 import { useReducer, useState } from "react"
+import './grid.css'
 
 type GridProps = {
-  walls: Array<Array<number>>
+  tiles: Array<Array<number>>
 }
 
-export function Grid({ walls }: GridProps) {
+export function Grid({ tiles }: GridProps) {
   const [grid,] = useState(() => {
-    return walls.map((row, i) =>
+    return tiles.map((row, i) =>
       <div className="grid-row" key={i}>
         {row.map((cell, j) =>
-          <div className={`grid-cell walls-${walls[i][j]}`} key={j}>
+          <div className={`grid-cell tiles-${tiles[i][j]}`} key={j}>
             {j},{i}
           </div>
         )}

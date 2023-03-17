@@ -6,13 +6,6 @@ import { Grid } from './grid';
 import { useCustomReducer } from './reducer';
 import { Win } from './win';
 
-const WALLS = [
-  [9, 5, 1, 3],
-  [10, 15, 8, 2],
-  [8, 1, 0, 2],
-  [12, 4, 4, 6],
-]
-
 type Pos = {
   x: number
   y: number
@@ -91,6 +84,8 @@ function reducer(state: State, action: any): State {
         crab: INIT.crab,
       }
     case 'step':
+      if (state.win) return state
+
       const trimmed = state.text.trim()
       const text = parseText(trimmed)
       const nextline = (state.line + 1) % text.length
@@ -197,10 +192,16 @@ function reducer(state: State, action: any): State {
   return state
 }
 
+const WALLS = [
+  [1, 1, 1, 1],
+  [0, 0, 0, 0],
+  [1, 1, 1, 1],
+]
+
 const INIT: State = {
   line: -1,
-  crab: { x: 0, y: 0 },
-  coco: { x: 3, y: 0 },
+  crab: { x: 0, y: 1 },
+  coco: { x: 3, y: 1 },
   result: 0,
   went: [],
   back: [],
@@ -247,15 +248,14 @@ function App() {
   const startPlay = useCallback(() => {
     if (intv !== 0) return
     const interval = setInterval(() => {
+      dispatch({ type: 'step' })
       if (state.win) {
         clearInterval(intv)
         setIntv(0)
-      } else {
-        dispatch({ type: 'step' })
       }
     }, 1000)
     setIntv(interval)
-  }, [state.win, intv, setIntv, dispatch])
+  }, [state, intv, setIntv, dispatch])
 
   return (
     <>
@@ -274,7 +274,7 @@ function App() {
             height: 32,
             transform: `translate(${state.crab.x * GRID_PX + 4}px, ${state.crab.y * GRID_PX + 4}px)`
           }} />
-          <Grid walls={state.tiles} />
+          <Grid tiles={state.tiles} />
         </div>
       </div>
       <div className="program">
@@ -305,7 +305,6 @@ function App() {
             <div>crab: {displayPos(state.crab)}</div>
             <div>coco: {displayPos(state.coco)}</div>
           </div>
-          <div>win: {state.win ? 'true' : 'false'}</div>
           <div>went: ...{state.went.slice(-5).map(num2pos).map(displayPos).join(' ')}</div>
           <div>back: ...{state.back.slice(-5).map(num2pos).map(displayPos).join('\n')}</div>
         </div>
