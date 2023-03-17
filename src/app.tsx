@@ -5,6 +5,7 @@ import './app.css'
 import { Grid } from './grid';
 import { useCustomReducer } from './reducer';
 import { Win } from './win';
+import { Tutorial, TutorialIcon } from './tutorial';
 
 type Pos = {
   x: number
@@ -214,6 +215,7 @@ const GRID_PX = 38
 
 function App() {
   const [state, dispatch] = useCustomReducer(reducer, INIT)
+  const [showTut, setShowTut] = useState(false)
   const [intv, setIntv] = useState(0 as any)
 
   const handleInput = useCallback((val: any) => {
@@ -257,9 +259,19 @@ function App() {
     setIntv(interval)
   }, [state, intv, setIntv, dispatch])
 
+  const clickTut = useCallback(() => {
+    setShowTut(true)
+  }, [setShowTut])
+
+  const exitTut = useCallback(() => {
+    setShowTut(false)
+  }, [setShowTut])
+
+
   return (
     <>
       {state.win && <Win goNext={() => null} />}
+      {showTut && <Tutorial onClose={exitTut} />}
       <div className="app">
         <div className="grid-container">
           <div className="avatar coco" style={{
@@ -279,13 +291,14 @@ function App() {
       </div>
       <div className="program">
         <div className="execution">
-          <button className="reset" onClick={reset}>RESET</button>
-          <button className="pause" onClick={stopPlay}>PAUSE</button>
+          <button className="reset" onClick={reset}>NEW</button>
+          <button className="pause" onClick={stopPlay}>STOP</button>
           <button className="back" onClick={stepBack}>BACK</button>
           <button className="step" onClick={stepNext}>STEP</button>
           <button className="play" onClick={startPlay}>PLAY</button>
         </div>
         <div className="lines">
+          <TutorialIcon onClick={clickTut} />
           <Editor
             className="editor"
             value={state.text}

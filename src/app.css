@@ -20,6 +20,7 @@
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
+  border: 1px solid white;
 }
 
 /* LAYOUT */
@@ -43,7 +44,7 @@
   width: 100%;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 1px;
   font-family: 'Courier New', Courier, monospace;
 }

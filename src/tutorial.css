@@ -1,0 +1,48 @@
+.tutorial-icon {
+  right: -6px;
+  top: -6px;
+  position: absolute;
+  text-align: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid white;
+  font-size: 22px;
+  border-radius: 100%;
+  background-color: hsl(270, 100%, 25%);
+  cursor: help;
+  z-index: 9;
+}
+
+.tutorial-exit {
+  right: -6px;
+  top: -6px;
+  position: absolute;
+  text-align: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid white;
+  font-size: 20px;
+  border-radius: 100%;
+  background-color: hsl(300, 100%, 25%);
+  cursor: pointer;
+  z-index: 9;
+}
+
+.tutorial {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tutorial-inner {
+  position: relative;
+  border: 1px solid white;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
