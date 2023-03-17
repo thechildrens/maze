@@ -282,10 +282,13 @@ function App() {
           />
         </div>
         <div className="debug">
-          <div>crab: {displayPos(state.crab)}</div>
-          <div>coco: {displayPos(state.coco)}</div>
-          <div>went: {state.went.slice(-5).map(num2pos).map(displayPos).join(' ')}...</div>
-          <div>back: {state.back.slice(-5).map(num2pos).map(displayPos).join('\n')}</div>
+          <div className="single-vars">
+            <div>result: {state.result}</div>
+            <div>crab: {displayPos(state.crab)}</div>
+            <div>coco: {displayPos(state.coco)}</div>
+          </div>
+          <div>went: ...{state.went.slice(-5).map(num2pos).map(displayPos).join(' ')}</div>
+          <div>back: ...{state.back.slice(-5).map(num2pos).map(displayPos).join('\n')}</div>
         </div>
       </div>
     </>

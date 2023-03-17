@@ -34,6 +34,9 @@
 }
 
 .debug {
+  display: grid;
+  grid-template-rows: repeat(1fr);
+  font-size: 14px;
   position: relative;
   height: 200px;
   padding: 12px;
@@ -42,6 +45,11 @@
   font-family: monospace;
   /* overflow: hidden; */
   box-sizing: border-box;
+}
+
+.debug .single-vars {
+  display: flex;
+  justify-content: space-between;
 }
 
 .lines {
