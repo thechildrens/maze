@@ -124,14 +124,18 @@ function reducer(state: State, action: any): State {
         case 'go':
           switch (line[1]) {
             case 'back':
-              let last = state.back.pop()
+              console.log(JSON.stringify(state.back))
+              let [last] = state.back.slice(-1)
+              console.log(num2pos(last))
               if (last == null) {
                 change = {
                   result: -1
                 }
               } else {
                 change = {
-                  back: [...state.back]
+                  result: 1,
+                  back: state.back.slice(0, -1),
+                  crab: num2pos(last)
                 }
               }
               break
@@ -143,20 +147,22 @@ function reducer(state: State, action: any): State {
                 }
               } else {
                 change = {
-                  crab: vars[dir]
+                  crab: vars[dir],
+                  went: [...state.went, pos2num(vars.here)],
+                  back: [...state.back, pos2num(vars.here)]
                 }
               }
           }
           break
-        case 'went':
-          where = vars[line[1]]
-          pnum = pos2num(where)
+        // case 'went':
+        //   where = vars[line[1]]
+        //   pnum = pos2num(where)
 
-          change = {
-            went: [...state.went, pnum],
-            back: [...state.back, pnum]
-          }
-          break
+        //   change = {
+        //     went: [...state.went, pnum],
+        //     back: [...state.back, pnum]
+        //   }
+        //   break
         case 'went?':
           where = vars[line[1]]
           pnum = pos2num(where)
@@ -200,14 +206,17 @@ function App() {
   }, [dispatch])
 
   const reset = useCallback(() => {
-    if (intv !== 0) return
+    if (intv) {
+      clearInterval(intv)
+      setIntv(0)
+    }
     dispatch({ type: 'reset' })
-  }, [])
+  }, [intv, setIntv])
 
   const stepNext = useCallback(() => {
     if (intv !== 0) return
     dispatch({ type: 'step' })
-  }, [dispatch])
+  }, [intv, dispatch])
 
   const stopPlay = useCallback(() => {
     if (intv) {
