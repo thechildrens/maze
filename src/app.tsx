@@ -3,6 +3,7 @@ import Editor from 'react-simple-code-editor';
 import Sprites from './sprites.png'
 import './app.css'
 import { Grid } from './grid';
+import { useCustomReducer } from './reducer';
 
 const WALLS = [
   [9, 5, 1, 3],
@@ -68,6 +69,9 @@ function num2pos(n: number): Pos {
 
 function reducer(state: State, action: any): State {
   switch (action.type) {
+    case '@REWIND':
+      console.log(action)
+      return action.lastState
     case 'edit':
       return {
         ...state,
@@ -206,7 +210,7 @@ const INIT: State = {
 const GRID_PX = 38
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, INIT)
+  const [state, dispatch] = useCustomReducer(reducer, INIT)
   const [intv, setIntv] = useState(0 as any)
 
   const handleInput = useCallback((val: any) => {
@@ -220,6 +224,11 @@ function App() {
     }
     dispatch({ type: 'reset' })
   }, [intv, setIntv])
+
+  const stepBack = useCallback(() => {
+    if (intv !== 0) return
+    dispatch({ type: '@REWIND' })
+  }, [intv, dispatch])
 
   const stepNext = useCallback(() => {
     if (intv !== 0) return
@@ -264,6 +273,7 @@ function App() {
         <div className="execution">
           <button className="reset" onClick={reset}>RESET</button>
           <button className="pause" onClick={stopPlay}>PAUSE</button>
+          <button className="back" onClick={stepBack}>BACK</button>
           <button className="step" onClick={stepNext}>STEP</button>
           <button className="play" onClick={startPlay}>PLAY</button>
         </div>
