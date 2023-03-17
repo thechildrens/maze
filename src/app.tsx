@@ -60,7 +60,7 @@ function pos2num(p: Pos): number {
   return (p.y << 8) + p.x
 }
 
-const XPOW = 2 ^ 8 - 1
+const XPOW = 2 ** 8 - 1
 
 function num2pos(n: number): Pos {
   return { x: n & XPOW, y: n >> 8 }
@@ -72,17 +72,22 @@ function reducer(state: State, action: any): State {
       return {
         ...state,
         line: -1,
+        went: [],
+        back: [],
         crab: INIT.crab,
         text: action.text,
       }
     case 'reset':
       return {
         ...state,
+        went: [],
+        back: [],
         line: -1,
         crab: INIT.crab,
       }
     case 'step':
-      const text = parseText(state.text.trim())
+      const trimmed = state.text.trim()
+      const text = parseText(trimmed)
       const nextline = (state.line + 1) % text.length
       const line = text[state.line]
       if (line == null) return {
@@ -124,9 +129,7 @@ function reducer(state: State, action: any): State {
         case 'go':
           switch (line[1]) {
             case 'back':
-              console.log(JSON.stringify(state.back))
               let [last] = state.back.slice(-1)
-              console.log(num2pos(last))
               if (last == null) {
                 change = {
                   result: -1
@@ -146,10 +149,14 @@ function reducer(state: State, action: any): State {
                   result: -1
                 }
               } else {
+                const went = [...state.went]
+                pnum = pos2num(vars.here)
+                if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
+                console.log(vars.here)
                 change = {
                   crab: vars[dir],
-                  went: [...state.went, pos2num(vars.here)],
-                  back: [...state.back, pos2num(vars.here)]
+                  went,
+                  back: [...state.back, pnum]
                 }
               }
           }
@@ -175,6 +182,7 @@ function reducer(state: State, action: any): State {
 
       return {
         ...state,
+        text: trimmed,
         line: nextline,
         result: 0,
         ...change,
@@ -273,9 +281,19 @@ function App() {
             }}
           />
         </div>
+        <div className="debug">
+          <div>crab: {displayPos(state.crab)}</div>
+          <div>coco: {displayPos(state.coco)}</div>
+          <div>went: {state.went.slice(-5).map(num2pos).map(displayPos).join(' ')}...</div>
+          <div>back: {state.back.slice(-5).map(num2pos).map(displayPos).join('\n')}</div>
+        </div>
       </div>
     </>
   )
+}
+
+function displayPos(p: Pos) {
+  return `(${p.x},${p.y})`
 }
 
 export default App;

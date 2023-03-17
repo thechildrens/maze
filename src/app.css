@@ -17,7 +17,7 @@
 .execution {
   display: flex;
   height: 50px;
-  margin-bottom: 11px;
+  margin-bottom: 12px;
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
@@ -33,11 +33,22 @@
   font-family: 'Courier New', Courier, monospace;
 }
 
+.debug {
+  position: relative;
+  height: 200px;
+  padding: 12px;
+  border: 1px solid white;
+  border-radius: 4px;
+  font-family: monospace;
+  /* overflow: hidden; */
+  box-sizing: border-box;
+}
 
 .lines {
   position: relative;
   height: 100%;
-  padding: 24px;
+  padding: 12px;
+  margin-bottom: 12px;
   border: 1px solid white;
   border-radius: 4px;
   font-family: monospace;
