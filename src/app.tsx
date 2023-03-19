@@ -6,6 +6,8 @@ import { Grid } from './grid';
 import { useCustomReducer } from './reducer';
 import { Win } from './win';
 import { Tutorial, TutorialIcon } from './tutorial';
+import { useLocalStorage } from './use-local';
+import { LEVELS } from './levels';
 
 type Pos = {
   x: number
@@ -46,13 +48,6 @@ function parseText(text: string) {
   return text.split('\n').map(parseLine)
 }
 
-const WALLCHECKS: { [k: string]: number } = {
-  up: 0b0001,
-  right: 0b0010,
-  down: 0b0100,
-  left: 0b1000,
-}
-
 function pos2num(p: Pos): number {
   return (p.y << 8) + p.x
 }
@@ -65,6 +60,9 @@ function num2pos(n: number): Pos {
 
 function reducer(state: State, action: any): State {
   switch (action.type) {
+    case '@SETLEVEL':
+      Object.assign(INIT, action.data)
+      return { ...INIT, text: state.text }
     case '@REWIND':
       return action.lastState
     case 'edit':
@@ -116,7 +114,6 @@ function reducer(state: State, action: any): State {
       let change = {}
       let where
       let pnum: number
-      const walls = state.tiles[state.crab.y][state.crab.x]
 
       const vars: { [k: string]: Pos } = {
         here: state.crab,
@@ -144,8 +141,9 @@ function reducer(state: State, action: any): State {
               }
               break
             default:
-              const dir = line[1]
-              if (walls & WALLCHECKS[dir]) {
+              const dir = vars[line[1]]
+              const tile = state.tiles[dir.y][dir.x]
+              if (tile == null || tile > 0) {
                 change = {
                   result: -1
                 }
@@ -154,9 +152,9 @@ function reducer(state: State, action: any): State {
                 pnum = pos2num(vars.here)
                 if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
                 change = {
-                  crab: vars[dir],
+                  crab: dir,
                   went,
-                  win: pos2num(vars[dir]) === pos2num(state.coco),
+                  win: pos2num(dir) === pos2num(state.coco),
                   back: [...state.back, pnum]
                 }
               }
@@ -193,34 +191,47 @@ function reducer(state: State, action: any): State {
   return state
 }
 
-const WALLS = [
-  [1, 1, 1, 1],
-  [0, 0, 0, 0],
-  [1, 1, 1, 1],
-]
-
 const INIT: State = {
   line: -1,
-  crab: { x: 0, y: 1 },
-  coco: { x: 3, y: 1 },
   result: 0,
   went: [],
   back: [],
   win: false,
-  tiles: WALLS,
+  crab: { x: 0, y: 0 },
+  coco: { x: 0, y: 0 },
+  tiles: [],
   text: ''
 }
 
 const GRID_PX = 38
 
 function App() {
+  const [progress, setProgress] = useState({ level: 0 })
   const [state, dispatch] = useCustomReducer(reducer, INIT)
   const [showTut, setShowTut] = useState(false)
   const [intv, setIntv] = useState(0 as any)
 
+  // set level
+  useEffect(() => {
+    dispatch({ type: '@SETLEVEL', data: LEVELS[progress.level] })
+  }, [progress.level])
+
+  const stopPlay = useCallback(() => {
+    if (intv) {
+      clearInterval(intv)
+      setIntv(0)
+    }
+  }, [intv, setIntv])
+
+  const nextLevel = useCallback(() => {
+    stopPlay()
+    setProgress(p => ({ level: p.level + 1 }))
+  }, [setProgress, stopPlay])
+
   const handleInput = useCallback((val: any) => {
+    stopPlay()
     dispatch({ type: 'edit', text: val })
-  }, [dispatch])
+  }, [stopPlay])
 
   const reset = useCallback(() => {
     if (intv) {
@@ -233,19 +244,12 @@ function App() {
   const stepBack = useCallback(() => {
     if (intv !== 0) return
     dispatch({ type: '@REWIND' })
-  }, [intv, dispatch])
+  }, [intv])
 
   const stepNext = useCallback(() => {
     if (intv !== 0) return
     dispatch({ type: 'step' })
-  }, [intv, dispatch])
-
-  const stopPlay = useCallback(() => {
-    if (intv) {
-      clearInterval(intv)
-      setIntv(0)
-    }
-  }, [intv, setIntv])
+  }, [intv])
 
   const startPlay = useCallback(() => {
     if (intv !== 0) return
@@ -257,7 +261,7 @@ function App() {
       }
     }, 1000)
     setIntv(interval)
-  }, [state, intv, setIntv, dispatch])
+  }, [state, intv, setIntv])
 
   const clickTut = useCallback(() => {
     setShowTut(true)
@@ -270,7 +274,7 @@ function App() {
 
   return (
     <>
-      {state.win && <Win goNext={() => null} />}
+      {state.win && <Win goNext={nextLevel} />}
       {showTut && <Tutorial onClose={exitTut} />}
       <div className="app">
         <div className="grid-container">
