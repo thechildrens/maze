@@ -4,7 +4,7 @@ import Sprites from './sprites.png'
 import './app.css'
 import { Grid } from './grid';
 import { useCustomReducer } from './reducer';
-import { Win } from './win';
+import { Lose, Win } from './win';
 import { Tutorial, TutorialIcon } from './tutorial';
 import { useLocalStorage } from './use-local';
 import { LEVELS } from './levels';
@@ -23,6 +23,7 @@ type State = {
   went: Array<number>
   back: Array<number>
   win: boolean
+  cooked: boolean
   tiles: Array<Array<number>>
 }
 
@@ -71,6 +72,7 @@ function reducer(state: State, action: any): State {
         line: -1,
         went: [],
         back: [],
+        cooked: false,
         crab: INIT.crab,
         text: action.text,
       }
@@ -80,6 +82,7 @@ function reducer(state: State, action: any): State {
         went: [],
         back: [],
         line: -1,
+        cooked: false,
         crab: INIT.crab,
       }
     case 'step':
@@ -143,7 +146,7 @@ function reducer(state: State, action: any): State {
             default:
               const dir = vars[line[1]]
               const tile = state.tiles[dir.y][dir.x]
-              if (tile == null || tile > 0) {
+              if (tile == null || (tile > 0 && tile < 3)) {
                 change = {
                   result: -1
                 }
@@ -155,6 +158,7 @@ function reducer(state: State, action: any): State {
                   crab: dir,
                   went,
                   win: pos2num(dir) === pos2num(state.coco),
+                  cooked: tile === 3,
                   back: [...state.back, pnum]
                 }
               }
@@ -197,6 +201,7 @@ const INIT: State = {
   went: [],
   back: [],
   win: false,
+  cooked: false,
   crab: { x: 0, y: 0 },
   coco: { x: 0, y: 0 },
   tiles: [],
@@ -234,12 +239,9 @@ function App() {
   }, [stopPlay])
 
   const reset = useCallback(() => {
-    if (intv) {
-      clearInterval(intv)
-      setIntv(0)
-    }
+    stopPlay()
     dispatch({ type: 'reset' })
-  }, [intv, setIntv])
+  }, [stopPlay])
 
   const stepBack = useCallback(() => {
     if (intv !== 0) return
@@ -274,6 +276,7 @@ function App() {
 
   return (
     <>
+      {state.cooked && <Lose restart={reset} />}
       {state.win && <Win goNext={nextLevel} />}
       {showTut && <Tutorial onClose={exitTut} />}
       <div className="app">

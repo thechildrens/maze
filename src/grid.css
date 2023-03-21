@@ -29,6 +29,10 @@
   background-position: 3px -30px;
 }
 
+.tiles-3 {
+  background-position: -158px 2px;
+}
+
 .grid-row:nth-child(odd) .grid-cell:nth-child(even) {
   background-color: rgb(233, 205, 164);
 }
