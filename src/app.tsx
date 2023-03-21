@@ -228,6 +228,14 @@ function App() {
     }
   }, [intv, setIntv])
 
+  // stop if cooked or win
+  useEffect(() => {
+    if (intv && (state.win || state.cooked)) {
+      clearInterval(intv)
+      setIntv(0)
+    }
+  }, [state.cooked, state.win])
+
   const nextLevel = useCallback(() => {
     stopPlay()
     setProgress(p => ({ level: p.level + 1 }))
@@ -255,15 +263,11 @@ function App() {
 
   const startPlay = useCallback(() => {
     if (intv !== 0) return
-    const interval = setInterval(() => {
+    const interval = setInterval(function () {
       dispatch({ type: 'step' })
-      if (state.win) {
-        clearInterval(intv)
-        setIntv(0)
-      }
     }, 1000)
     setIntv(interval)
-  }, [state, intv, setIntv])
+  }, [intv, setIntv])
 
   const clickTut = useCallback(() => {
     setShowTut(true)
