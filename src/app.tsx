@@ -71,6 +71,7 @@ function reducer(state: State, action: any): State {
         cooked: false,
         crab: INIT.crab,
         coco: INIT.coco,
+        tiles: INIT.tiles,
         text: action.text,
       }
     case 'reset':
@@ -82,6 +83,7 @@ function reducer(state: State, action: any): State {
         cooked: false,
         crab: INIT.crab,
         coco: INIT.coco,
+        tiles: INIT.tiles,
       }
     case 'step':
       if (state.win) return state
