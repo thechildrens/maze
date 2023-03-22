@@ -8,13 +8,9 @@ import { Lose, Win } from './win';
 import { Tutorial, TutorialIcon } from './tutorial';
 import { useLocalStorage } from './use-local';
 import { LEVELS } from './levels';
+import { Pos, rotate } from './rotate';
 
-type Pos = {
-  x: number
-  y: number
-}
-
-type State = {
+export type State = {
   line: number
   crab: Pos
   coco: Pos
@@ -91,6 +87,23 @@ function reducer(state: State, action: any): State {
       const trimmed = state.text.trim()
       const text = parseText(trimmed)
       const nextline = (state.line + 1) % text.length
+      if (state.line === -1) {
+        if (Math.random() < 0.5) {
+          return {
+            ...state,
+            ...rotate(state),
+            line: nextline,
+            result: -1,
+          }
+        }
+
+        return {
+          ...state,
+          line: nextline,
+          result: -1,
+        }
+      }
+
       const line = text[state.line]
       if (line == null) return {
         ...state,
@@ -145,21 +158,31 @@ function reducer(state: State, action: any): State {
               break
             default:
               const dir = vars[line[1]]
-              const tile = state.tiles[dir.y][dir.x]
-              if (tile == null || (tile > 0 && tile < 3)) {
+              if (
+                dir.y < 0 || dir.x < 0
+                || dir.y >= state.tiles.length
+                || dir.x >= state.tiles[0].length
+              ) {
                 change = {
                   result: -1
                 }
               } else {
-                const went = [...state.went]
-                pnum = pos2num(vars.here)
-                if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
-                change = {
-                  crab: dir,
-                  went,
-                  win: pos2num(dir) === pos2num(state.coco),
-                  cooked: tile === 3,
-                  back: [...state.back, pnum]
+                const tile = state.tiles[dir.y][dir.x]
+                if (tile > 0 && tile < 3) {
+                  change = {
+                    result: -1
+                  }
+                } else {
+                  const went = [...state.went]
+                  pnum = pos2num(vars.here)
+                  if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
+                  change = {
+                    crab: dir,
+                    went,
+                    win: pos2num(dir) === pos2num(state.coco),
+                    cooked: tile === 3,
+                    back: [...state.back, pnum]
+                  }
                 }
               }
           }
