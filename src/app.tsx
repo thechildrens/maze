@@ -92,14 +92,14 @@ function reducer(state: State, action: any): State {
       const text = parseText(trimmed)
       const nextline = (state.line + 1) % text.length
       if (state.line === -1) {
-        if (Math.random() < 0.5) {
-          return {
-            ...state,
-            ...rotate(state),
-            line: nextline,
-            result: -1,
-          }
-        }
+        // if (Math.random() < 0.5) {
+        //   return {
+        //     ...state,
+        //     ...rotate(state),
+        //     line: nextline,
+        //     result: -1,
+        //   }
+        // }
 
         return {
           ...state,

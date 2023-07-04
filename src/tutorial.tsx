@@ -19,8 +19,8 @@ export function Tutorial({ onClose }: TutorialProps) {
       <div>go [direction]</div>
       <div>go back</div>
       <div>went? [direction]: returns true if direction has been visited</div>
-      <div>-[words] can run if last result is negative</div>
-      <div>+[words] run if last result is negative</div>
+      <div>-[words] run if last result is negative</div>
+      <div>+[words] run if last result is positive</div>
     </div>
   </div>
 }

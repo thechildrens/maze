@@ -184,3 +184,7 @@ button.step:active {
 button.play:active {
   background-color: hsl(120, 50%, 70%);
 }
+
+.avatar.crab {
+  transition-duration: 100ms;
+}
