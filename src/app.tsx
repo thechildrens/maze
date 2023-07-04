@@ -66,7 +66,7 @@ function reducer(state: State, action: any): State {
       return {
         ...state,
         line: -1,
-        went: [],
+        went: [pos2num(INIT.crab)],
         back: [],
         cooked: false,
         crab: INIT.crab,
@@ -77,7 +77,7 @@ function reducer(state: State, action: any): State {
     case 'reset':
       return {
         ...state,
-        went: [],
+        went: [pos2num(INIT.crab)],
         back: [],
         line: -1,
         cooked: false,
@@ -120,19 +120,17 @@ function reducer(state: State, action: any): State {
         return {
           ...state,
           line: nextline,
-          result: 0
         }
       }
       if (rail === '-' && state.result > -1) {
         return {
           ...state,
           line: nextline,
-          result: 0
         }
       }
 
       let change = {}
-      let where
+      let where: Pos
       let pnum: number
 
       const vars: { [k: string]: Pos } = {
@@ -178,7 +176,7 @@ function reducer(state: State, action: any): State {
                   }
                 } else {
                   const went = [...state.went]
-                  pnum = pos2num(vars.here)
+                  pnum = pos2num(dir)
                   if (went.findIndex(n => n === pnum) === -1) went.push(pnum)
                   change = {
                     crab: dir,
@@ -191,21 +189,32 @@ function reducer(state: State, action: any): State {
               }
           }
           break
-        // case 'went':
-        //   where = vars[line[1]]
-        //   pnum = pos2num(where)
+        case 'fire?':
+          where = vars[line[1]]
 
-        //   change = {
-        //     went: [...state.went, pnum],
-        //     back: [...state.back, pnum]
-        //   }
-        //   break
+          change = {
+            result: state.tiles[where.y][where.x] === 3 ? 1 : -1
+          }
+          break
+
         case 'went?':
           where = vars[line[1]]
           pnum = pos2num(where)
-
-          change = {
-            result: state.went.findIndex(n => n === pnum)
+          if (where.y < 0 || where.x < 0 || where.y >= state.tiles.length || where.x >= state.tiles[0].length) {
+            change = {
+              result: 999
+            }
+          } else {
+            const tile = state.tiles[where.y][where.x]
+            if (tile > 0) {
+              change = {
+                result: 999
+              }
+            } else {
+              change = {
+                result: state.went.findIndex(n => n === pnum)
+              }
+            }
           }
           break
       }
@@ -225,7 +234,7 @@ function reducer(state: State, action: any): State {
 const INIT: State = {
   line: -1,
   result: 0,
-  went: [],
+  went: [pos2num({ x: 0, y: 0 })],
   back: [],
   win: false,
   cooked: false,
@@ -292,7 +301,7 @@ function App() {
     if (intv !== 0) return
     const interval = setInterval(function () {
       dispatch({ type: 'step' })
-    }, 1000)
+    }, 500)
     setIntv(interval)
   }, [intv, setIntv])
 
